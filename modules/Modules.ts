@@ -629,7 +629,7 @@ export class EndToEndModule {
     await this.homePage.clickLogout();
     await this.homePage.page.waitForTimeout(1000);
 
-    const isLogoutSuccessful = !(await this.homePage.isLoggedInUsernameVisible());
+    const isLogoutSuccessful = !(await this.homePage.isLoggedInUsernameVisible(this.data.expectedUsername));
     expect(isLogoutSuccessful, 'User should be logged out').toBe(true);
   }
 }

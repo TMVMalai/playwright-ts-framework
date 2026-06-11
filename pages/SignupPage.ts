@@ -3,7 +3,7 @@ import * as helper from '../utils/helperFunctions';
 
 export class SignupPage {
   readonly page: playwright.Page;
-  readonly titleRadioButton:(value:string)=> playwright.Locator;
+  readonly titleRadioButton:(value:string) =>playwright.Locator;
   readonly passwordField: playwright.Locator;
   readonly dayDropdown: playwright.Locator;
   readonly monthDropdown: playwright.Locator;
