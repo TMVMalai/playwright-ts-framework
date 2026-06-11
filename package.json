@@ -1,0 +1,23 @@
+{
+  "name": "playwright-ts-framework",
+  "version": "1.0.0",
+  "description": "Converted framework from Java + Playwright + TestNG to TypeScript + Playwright Test",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:ui": "npx playwright test --ui",
+    "test:regression": "npx playwright test --grep @regression",
+    "report": "npx playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@types/node": "latest",
+    "typescript": "latest"
+  },
+  "dependencies": {
+    "@faker-js/faker": "latest",
+    "xlsx": "latest"
+  }
+}

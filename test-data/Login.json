@@ -1,0 +1,16 @@
+{
+  "loginTest": [
+    {
+      "email": "thiru@gmail.com",
+      "password": "thiru123",
+      "toastMessage": "Welcome thirumalaivasan"
+    }
+  ],
+  "invalidLoginTest": [
+    {
+      "email": "wrong@gmail.com",
+      "password": "wrong123",
+      "toastMessage": "Invalid password"
+    }
+  ]
+}
