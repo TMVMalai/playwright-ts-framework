@@ -15,6 +15,29 @@ export async function getText(locator: Locator): Promise<string> {
   return (await locator.innerText()).trim();
 }
 
+export async function selectDropdownByValue(
+  locator: Locator,
+  value: string,
+  elementName = 'dropdown'
+): Promise<void> {
+  await expect(locator, `${elementName} should be visible before selecting`).toBeVisible();
+  await locator.selectOption(value);
+}
+
+export async function checkRadioButton(locator: Locator, elementName = 'radio button'): Promise<void> {
+  await expect(locator, `${elementName} should be visible before checking`).toBeVisible();
+  await locator.check();
+}
+
+export async function selectDropdownByLabel(
+  locator: Locator,
+  label: string,
+  elementName = 'dropdown'
+): Promise<void> {
+  await expect(locator, `${elementName} should be visible before selecting`).toBeVisible();
+  await locator.selectOption({ label });
+}
+
 export async function login(page: Page, email: string, password: string): Promise<void> {
   await page.locator("//input[@type='email']").fill(email);
   await page.locator("//input[@type='password']").fill(password);

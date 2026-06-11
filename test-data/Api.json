@@ -1,0 +1,51 @@
+{
+  "apiGetAllProductsTest": [
+    {
+      "endpoint": "https://automationexercise.com/api/products"
+    }
+  ],
+  "apiSearchProductTest": [
+    {
+      "endpoint": "https://automationexercise.com/api/search",
+      "searchProduct": "T-Shirt"
+    }
+  ],
+  "apiSearchProductWithoutParameterTest": [
+    {
+      "endpoint": "https://automationexercise.com/api/search"
+    }
+  ],
+  "apiVerifyLoginValidTest": [
+    {
+      "endpoint": "https://automationexercise.com/api/login",
+      "email": "testuser@example.com",
+      "password": "Password123"
+    }
+  ],
+  "apiVerifyLoginInvalidTest": [
+    {
+      "endpoint": "https://automationexercise.com/api/login",
+      "email": "invalid@example.com",
+      "password": "wrongpass"
+    }
+  ],
+  "apiCreateUserTest": [
+    {
+      "endpoint": "https://automationexercise.com/api/createUser",
+      "payload": {
+        "name": "APITestUser",
+        "email": "apitestuser@example.com",
+        "password": "ApiPass123"
+      }
+    }
+  ],
+  "apiDeleteUserTest": [
+    {
+      "endpoint": "https://automationexercise.com/api/deleteUser",
+      "payload": {
+        "email": "apitestuser@example.com",
+        "password": "ApiPass123"
+      }
+    }
+  ]
+}

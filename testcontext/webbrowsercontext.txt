@@ -1,0 +1,435 @@
+# webtextcontext.txt
+# Context for GitHub Copilot / MCP / AI assistant
+# Project: playwright-ts-framework
+# Repository: https://github.com/TMVMalai/playwright-ts-framework
+
+You are working inside my Playwright TypeScript automation framework. Before generating or changing code, understand and follow my framework style exactly.
+
+## 1. Framework purpose
+
+This is a Playwright TypeScript framework converted from my Java + Playwright + TestNG framework.
+
+Important Java to TypeScript mapping in this framework:
+- Java TestNG @Test is replaced with Playwright `test()`.
+- Java `Modules.java` concept is replaced with `modules/LoginModule.ts`.
+- Java `Pages.java` concept is replaced with `pages/LoginPage.ts`.
+- Java DataProvider style is replaced with JSON data reading from `test-data/Login.json` using the current Playwright test name.
+- Java CommonFunctions / helper methods are replaced with utility functions inside `utils/helperFunctions.ts`.
+- Test execution, retries, screenshots, videos, traces, and parallel execution are controlled by `playwright.config.ts`.
+
+## 2. Very important framework rule
+
+Do not write full test actions directly inside the test spec file.
+
+My framework flow should always be:
+
+`tests/*.spec.ts`
+  -> reads JSON test data based on `testInfo.title`
+  -> creates a Module object by passing `(data, page)`
+  -> opens URL using `page.goto(getUrl())`
+  -> calls a test-case-level method from the Module class
+  -> Module class calls Page class methods
+  -> Page class uses locators and helper functions
+
+The test class should be clean. The test class should not contain all locators and step-by-step UI actions.
+
+## 3. Module layer rule
+
+The `modules` layer is my common business-flow layer.
+
+In my design, the Module class is not only for one page. It is a common place where I call required page classes and form complete test case methods.
+
+Example:
+- `LoginModule` creates and uses `LoginPage`.
+- Later, another module can create and use multiple pages such as LoginPage, DashboardPage, ProfilePage, etc.
+- A module method should represent a business flow or test scenario method.
+
+Example style:
+
+```ts
+export class LoginModule {
+  loginPage: LoginPage;
+  data: any;
+
+  constructor(data: any, page: Page) {
+    this.loginPage = new LoginPage(page);
+    this.data = data;
+  }
+
+  async login(): Promise<void> {
+    await this.loginPage.enterEmail(this.data.email);
+    await this.loginPage.enterPassword(this.data.password);
+    await this.loginPage.clickLoginButton();
+
+    const actualToastMessage = await this.loginPage.getToastMessageText();
+    expect(actualToastMessage, 'Toast message should match').toBe(this.data.toastMessage);
+  }
+}
+```
+
+When generating a new scenario, create the complete flow inside the Module class, then call that module method from the test spec.
+
+## 4. Page layer rule
+
+The Page class should contain:
+- locators
+- small page-specific action methods
+- methods to get UI text
+- calls to helper utility methods
+
+Example style:
+
+```ts
+export class LoginPage {
+  readonly page: playwright.Page;
+  readonly emailIdField: playwright.Locator;
+  readonly passwordField: playwright.Locator;
+  readonly loginButton: playwright.Locator;
+  readonly toastMessage: playwright.Locator;
+
+  constructor(page: playwright.Page) {
+    this.page = page;
+    this.emailIdField = page.locator("//input[@type='email']");
+    this.passwordField = page.locator("//input[@type='password']");
+    this.loginButton = page.locator("//button[text()='Login']");
+    this.toastMessage = page.locator("//div[contains(@class,'Toastify__toast-icon')]//parent::div[@role]");
+  }
+
+  async enterEmail(email: string): Promise<void> {
+    await helper.sendText(this.emailIdField, email, 'Email field');
+  }
+
+  async enterPassword(password: string): Promise<void> {
+    await helper.sendText(this.passwordField, password, 'Password field');
+  }
+
+  async clickLoginButton(): Promise<void> {
+    await helper.click(this.loginButton, 'Login button');
+  }
+
+  async getToastMessageText(): Promise<string> {
+    return helper.getText(this.toastMessage);
+  }
+}
+```
+
+Do not put assertions in Page class unless I specifically ask. Assertions should usually be in the Module layer or spec layer depending on the scenario. In my current style, toast assertion is inside the Module layer.
+
+## 5. Locator and XPath rule
+
+Use only proper, reusable, understandable XPath locators.
+
+Locator rules:
+- Keep all locators inside Page classes only.
+- Do not write locators directly inside spec files.
+- Use meaningful locator variable names such as `emailIdField`, `loginButton`, `productNameText`, `cartProductRow`.
+- Prefer stable attributes such as `id`, `name`, `type`, `placeholder`, `data-testid`, `aria-label`, `role`, and visible text when they are reliable.
+- Avoid absolute XPath such as `/html/body/div[1]/div[2]/form/input[1]`.
+- Avoid brittle XPath based only on changing indexes such as `(//button)[5]` unless there is no better option.
+- Avoid dynamic/generated class names if they change frequently.
+- Use `normalize-space()` when validating visible text to avoid spacing issues.
+- Use `contains()` carefully only when partial matching is really needed.
+- Use reusable dynamic locator methods when the locator value changes based on test data.
+
+Good XPath examples:
+
+```ts
+this.emailIdField = page.locator("//input[@type='email']");
+this.passwordField = page.locator("//input[@type='password']");
+this.loginButton = page.locator("//button[normalize-space()='Login']");
+this.toastMessage = page.locator("//div[contains(@class,'Toastify__toast-icon')]//parent::div[@role]");
+```
+
+Use proper XPath axes when element relationship is important.
+
+XPath axes examples:
+- `parent::`
+- `ancestor::`
+- `following-sibling::`
+- `preceding-sibling::`
+- `descendant::`
+- `following::`
+- `preceding::`
+
+Good XPath axes examples:
+
+```ts
+this.toastMessage = page.locator("//div[contains(@class,'Toastify__toast-icon')]//parent::div[@role]");
+this.productPriceByName = (productName: string) =>
+  page.locator(`//p[normalize-space()='${productName}']//ancestor::div[contains(@class,'productinfo')]//h2`);
+
+this.addToCartByProductName = (productName: string) =>
+  page.locator(`//p[normalize-space()='${productName}']//ancestor::div[contains(@class,'product-image-wrapper')]//a[contains(normalize-space(),'Add to cart')]`);
+
+this.errorMessageNearEmail = page.locator("//input[@type='email']//following-sibling::*[contains(@class,'error')]");
+```
+
+For dynamic locators, prefer Page class methods:
+
+```ts
+getProductByName(productName: string): playwright.Locator {
+  return this.page.locator(`//p[normalize-space()='${productName}']`);
+}
+```
+
+Do not create unclear locators like:
+
+```ts
+page.locator("(//div//button)[3]");
+page.locator("/html/body/div[2]/div/div[1]/button");
+page.locator("//div[@class='css-1abcxyz']");
+```
+
+If a locator is complex, write it in a reusable method with a clear method name and use XPath axes properly.
+
+
+## 6. Test spec layer rule
+
+Test spec files should follow this pattern:
+
+```ts
+import { test } from '@playwright/test';
+import { LoginModule } from '../modules/LoginModule';
+import { getUrl } from '../utils/configReader';
+import { readJsonData } from '../utils/jsonReader';
+
+test.describe.configure({ mode: 'parallel' });
+
+test.describe('Login Functionality @regression', () => {
+
+  test('loginTest', async ({ page }, testInfo) => {
+    const testData = readJsonData('Login.json', testInfo.title);
+
+    for (const data of testData) {
+      const loginModule = new LoginModule(data, page);
+      await page.goto(getUrl());
+      await loginModule.login();
+    }
+  });
+
+});
+```
+
+Important:
+- Use `testInfo.title` to fetch the correct JSON data key.
+- Do not hardcode the data provider key like `'loginTest'` manually if `testInfo.title` can be used.
+- Data-driven testing should use a loop because each JSON key can contain multiple test data sets.
+- Always use `await` for Playwright actions and module methods.
+
+## 7. JSON data rule
+
+Test data is stored inside `test-data` folder.
+
+Current file: `test-data/Login.json`
+
+Current structure:
+
+```json
+{
+  "loginTest": [
+    {
+      "email": "thiru@gmail.com",
+      "password": "thiru123",
+      "toastMessage": "Welcome thirumalaivasan"
+    }
+  ],
+  "invalidLoginTest": [
+    {
+      "email": "wrong@gmail.com",
+      "password": "wrong123",
+      "toastMessage": "Invalid password"
+    }
+  ]
+}
+```
+
+The JSON key must match the Playwright test title.
+
+Example:
+- test title: `loginTest`
+- JSON key: `loginTest`
+
+This is similar to Java TestNG DataProvider reading data based on method name.
+
+## 8. JSON reader rule
+
+Use `readJsonData(fileName, testInfo.title)`.
+
+Current utility behavior:
+- Reads file from `test-data` folder.
+- Parses JSON.
+- Uses current test name to fetch data.
+- Throws an error if data is not found.
+
+Expected usage:
+
+```ts
+const testData = readJsonData('Login.json', testInfo.title);
+```
+
+Do not create separate hardcoded data-reading logic inside test cases.
+
+## 9. Config reader rule
+
+Use `getUrl()` to open the application.
+
+Current URL logic:
+- Default environment is `qa`.
+- QA URL defaults to `https://www.indiaagram.com/login` if no environment variable is passed.
+- Other environments can be passed using environment variables.
+
+Expected usage:
+
+```ts
+await page.goto(getUrl());
+```
+
+Do not hardcode the URL inside each test unless I specifically ask.
+
+## 10. Helper function rule
+
+Reusable actions are inside `utils/helperFunctions.ts`.
+
+Current helper methods include:
+- `click(locator, elementName)`
+- `sendText(locator, value, elementName)`
+- `getText(locator)`
+- `switchToWindowByIndex(context, index)`
+- `acceptJavaScriptAlert(page)`
+- `dismissJavaScriptAlert(page)`
+- `acceptPromptAlert(page, inputText)`
+
+Use these helpers from Page classes.
+
+Example:
+
+```ts
+await helper.sendText(this.emailIdField, email, 'Email field');
+await helper.click(this.loginButton, 'Login button');
+const text = await helper.getText(this.toastMessage);
+```
+
+## 11. Parallel execution rule
+
+Parallel execution is handled by Playwright, not ThreadLocal.
+
+Current config uses:
+- `fullyParallel: true`
+- retries in `playwright.config.ts`
+- workers from Playwright config / CLI
+
+Do not suggest Java-style ThreadLocal for Playwright TypeScript.
+
+In Playwright TypeScript:
+- Each test gets its own `page` fixture.
+- Each test gets isolated browser context behavior.
+- Use `test.describe.configure({ mode: 'parallel' })` if tests inside a file should be parallel.
+
+## 12. Screenshots, video, trace rule
+
+Do not create custom screenshot handling unless specifically required.
+
+Current Playwright config already handles:
+- screenshot: `only-on-failure`
+- video: `retain-on-failure`
+- trace: `on-first-retry`
+
+For debugging only, manual screenshots can be added temporarily:
+
+```ts
+await page.screenshot({ path: 'debug-page.png', fullPage: true });
+```
+
+## 13. API testing rule
+
+API examples are kept in `api-tests/user.api.spec.ts`.
+
+Current API examples use Playwright `request` fixture to validate:
+- GET response status
+- POST response status
+- JSON response body fields
+- response properties
+
+When adding API tests, use Playwright built-in `request` fixture.
+
+Example style:
+
+```ts
+test('GET user and validate response', async ({ request }) => {
+  const response = await request.get('https://reqres.in/api/users/2');
+  expect(response.status()).toBe(200);
+  const body = await response.json();
+  expect(body.data).toHaveProperty('id', 2);
+});
+```
+
+## 14. Coding style preferences
+
+Follow these coding preferences:
+- Use TypeScript.
+- Use Playwright Test.
+- Use async/await properly.
+- Use Page Object Model.
+- Keep locators in Page classes.
+- Keep reusable UI actions in helper functions.
+- Keep business flow / complete test case actions in Module classes.
+- Keep spec files simple and readable.
+- Use JSON data reading based on `testInfo.title`.
+- Do not directly write all steps inside the test case.
+- Do not change the framework style unless I ask.
+
+## 15. When generating new tests
+
+When I ask for a new test case, generate files in this style:
+
+1. Add/update Page class under `pages/`.
+2. Add/update Module class under `modules/`.
+3. Add/update JSON test data under `test-data/`.
+4. Add/update test spec under `tests/`.
+
+The spec should only:
+- read data
+- create module object
+- open URL
+- call module method
+
+## 16. Example new test format
+
+For a new feature, use this structure:
+
+```ts
+test('newFeatureTest', async ({ page }, testInfo) => {
+  const testData = readJsonData('Feature.json', testInfo.title);
+
+  for (const data of testData) {
+    const module = new FeatureModule(data, page);
+    await page.goto(getUrl());
+    await module.performFeatureFlow();
+  }
+});
+```
+
+Then `FeatureModule` should call required page methods and perform validations.
+
+## 17. Do not do these
+
+Do not:
+- Put all locators inside the spec file.
+- Put all Playwright actions directly inside the spec file.
+- Hardcode test data inside spec files.
+- Hardcode URL in every test.
+- Replace Module layer with direct Page calls from spec unless I ask.
+- Suggest ThreadLocal for Playwright TypeScript.
+- Create custom screenshot utility unless needed.
+- Use Java/TestNG syntax in TypeScript files.
+
+## 18. Summary of my expected architecture
+
+`tests` = test definitions and data loop
+`modules` = common business flow layer where pages are called and test-case methods are formed
+`pages` = locators and page-specific actions
+`utils` = reusable helpers, config reader, JSON reader
+`test-data` = JSON data mapped by test title
+`playwright.config.ts` = execution config, reports, retries, screenshot, video, trace, parallel
+
+Always respect this architecture when generating, refactoring, debugging, or explaining code.

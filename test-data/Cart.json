@@ -1,0 +1,17 @@
+{
+  "addToCartTest": [
+    {
+      "expectedMinProducts": 1
+    }
+  ],
+  "cartQuantityTest": [
+    {
+      "quantity": "2"
+    }
+  ],
+  "removeProductFromCartTest": [
+    {
+      "expectedEmptyMessage": "Cart is empty!"
+    }
+  ]
+}

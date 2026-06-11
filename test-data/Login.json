@@ -1,16 +1,22 @@
 {
   "loginTest": [
     {
-      "email": "thiru@gmail.com",
-      "password": "thiru123",
-      "toastMessage": "Welcome thirumalaivasan"
+      "email": "tmvthirumalai@gmail.com",
+      "password": "NewPass@123",
+      "expectedUsername": "Thirumalaivasan"
     }
   ],
   "invalidLoginTest": [
     {
-      "email": "wrong@gmail.com",
-      "password": "wrong123",
-      "toastMessage": "Invalid password"
+      "email": "tmvthirumai@gmail.com",
+      "password": "wrongpass",
+      "expectedErrorMessage": "Your email or password is incorrect"
+    }
+  ],
+  "logoutTest": [
+    {
+      "email": "tmvthirumalai@gmail.com",
+      "password": "NewPass@123"
     }
   ]
 }

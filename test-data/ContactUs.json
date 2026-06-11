@@ -1,0 +1,12 @@
+{
+  "contactUsTest": [
+    {
+      "name": "Automation Tester",
+      "email": "tester@example.com",
+      "subject": "Inquiry about product",
+      "message": "Please provide more details.",
+      "filePath": "test-data/sample-upload.txt",
+      "expectedSuccessMessage": "Success! Your details have been submitted successfully."
+    }
+  ]
+}

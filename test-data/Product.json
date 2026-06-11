@@ -1,0 +1,26 @@
+{
+  "productSearchTest": [
+    {
+      "productName": "T-Shirt",
+      "categoryName": "Women",
+      "subCategoryName": "Dresses",
+      "brandName": "Polo"
+    }
+  ],
+  "productDetailsTest": [
+    {
+      "productName": "T-Shirt"
+    }
+  ],
+  "verifyCategoryProductsTest": [
+    {
+      "categoryName": "Women",
+      "subCategoryName": "Dresses"
+    }
+  ],
+  "verifyBrandProductsTest": [
+    {
+      "brandName": "Polo"
+    }
+  ]
+}

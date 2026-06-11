@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { LoginModule } from '../modules/LoginModule';
+import { test } from '@playwright/test';
+import { LoginModule } from '../modules/Modules';
 import { getUrl } from '../utils/configReader';
 import { readJsonData } from '../utils/jsonReader';
 
@@ -11,7 +11,7 @@ test.describe('Login Functionality @regression', () => {
     const testData = readJsonData('Login.json', testInfo.title);
 
     for (const data of testData) {
-      const loginModule = new LoginModule(data,page);
+      const loginModule = new LoginModule(data, page);
       await page.goto(getUrl());
       await loginModule.login();
     }
@@ -21,9 +21,20 @@ test.describe('Login Functionality @regression', () => {
     const testData = readJsonData('Login.json', testInfo.title);
 
     for (const data of testData) {
-      const loginModule = new LoginModule(data,page);
+      const loginModule = new LoginModule(data, page);
+      await page.goto(getUrl());
+      await loginModule.loginWithInvalidCredentials();
+    }
+  });
+
+  test('logoutTest', async ({ page }, testInfo) => {
+    const testData = readJsonData('Login.json', testInfo.title);
+
+    for (const data of testData) {
+      const loginModule = new LoginModule(data, page);
       await page.goto(getUrl());
       await loginModule.login();
+      await loginModule.logout();
     }
   });
 

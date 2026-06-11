@@ -1,0 +1,25 @@
+{
+  "signupTest": [
+    {
+      "signupName": "Thirumalaivasan",
+      "signupEmail": "tmvthirumalai@gmail.com",
+      "title": "Mr",
+      "password": "NewPass@123",
+      "day": "1",
+      "month": "1",
+      "year": "1990",
+      "newsletter": "true",
+      "offers": "true",
+      "firstName": "New",
+      "lastName": "User",
+      "company": "TestCompany",
+      "address": "123 Test Street",
+      "country": "India",
+      "state": "TestState",
+      "city": "TestCity",
+      "zipcode": "123456",
+      "mobileNumber": "1234567890",
+      "expectedSuccessMessage": "ACCOUNT CREATED!"
+    }
+  ]
+}

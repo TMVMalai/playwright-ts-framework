@@ -1,7 +1,7 @@
 export type EnvironmentName = 'qa' | 'dev' | 'app';
 
 const urls: Record<EnvironmentName, string> = {
-  qa: process.env.QA_URL || process.env.BASE_URL || 'https://www.indiaagram.com/login',
+  qa: process.env.QA_URL || process.env.BASE_URL || 'https://automationexercise.com',
   dev: process.env.DEV_URL || 'https://dev.example.com',
   app: process.env.APP_URL || 'https://app.example.com'
 };

@@ -1,0 +1,65 @@
+{
+  "checkoutWithoutLoginTest": [
+    {
+      "note": "no-data"
+    }
+  ],
+  "checkoutWithLoginTest": [
+    {
+      "email": "testuser@example.com",
+      "password": "Password123"
+    }
+  ],
+  "placeOrderTest": [
+    {
+      "email": "testuser@example.com",
+      "password": "Password123",
+      "orderComment": "Please deliver between 9 AM - 6 PM",
+      "nameOnCard": "Test User",
+      "cardNumber": "4242424242424242",
+      "cvc": "123",
+      "expiryMonth": "12",
+      "expiryYear": "2030",
+      "expectedSuccessMessage": "Order Placed!"
+    }
+  ],
+  "subscriptionHomePageTest": [
+    {
+      "email": "subscriber@example.com",
+      "expectedSuccessMessage": "You have been successfully subscribed!"
+    }
+  ],
+  "subscriptionCartPageTest": [
+    {
+      "email": "subscriber@example.com",
+      "expectedSuccessMessage": "You have been successfully subscribed!"
+    }
+  ],
+  "endToEndUserJourneyTest": [
+    {
+      "signupName": "e2euser",
+      "signupEmail": "e2euser+{{timestamp}}@example.com",
+      "title": "Mr",
+      "password": "E2EPass123",
+      "day": "1",
+      "month": "1",
+      "year": "1990",
+      "firstName": "E2E",
+      "lastName": "User",
+      "address": "100 E2E Street",
+      "country": "India",
+      "state": "E2EState",
+      "city": "E2ECity",
+      "zipcode": "111111",
+      "mobileNumber": "1112223334",
+      "productName": "T-Shirt",
+      "orderComment": "E2E order",
+      "nameOnCard": "E2E User",
+      "cardNumber": "4242424242424242",
+      "cvc": "123",
+      "expiryMonth": "12",
+      "expiryYear": "2030",
+      "expectedSuccessMessage": "Order Placed!"
+    }
+  ]
+}
